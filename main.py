@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
-from src.inspect_files import *
-from src.audio_compressor import *
+from src.inspect_files import generate_all_metadata
+from src.audio_compressor import process_files
 
 if __name__ == "__main__":
     # Charger les variables d'environnement depuis le fichier .env
@@ -12,6 +12,6 @@ if __name__ == "__main__":
 
     if folder_path:
         process_files(folder_path)
-        inspect_files(folder_path)
+        generate_all_metadata(folder_path)
     else:
         print("La variable FOLDER n'est pas définie dans le fichier .env")

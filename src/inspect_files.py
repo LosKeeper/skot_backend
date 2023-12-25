@@ -2,22 +2,45 @@ import os
 import json
 from collections import defaultdict
 
-def inspect_files(folder_path):
-    audio_files = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    for root, _, files in os.walk(folder_path):
-        grandparent_dir = os.path.basename(os.path.dirname(root))  # Répertoire parent supplémentaire
-        for file in files:
-            if file.endswith((".aac", ".wav", ".flac")):
-                file_path = os.path.join(root, file)
-                file_info = {
-                    "file_codec": os.path.splitext(file)[1].replace(".", ""),
-                    "file_path": file_path.replace("\\", "/"),  # Utilisation des slashes vers le style Unix
-                    "file_size": os.path.getsize(file_path)
-                }
-                parent_dir = os.path.basename(root)
-                file_name_without_extension = os.path.splitext(file)[0]
-                audio_files[grandparent_dir][parent_dir][file_name_without_extension].append(file_info)
 
-    json_data = json.dumps(audio_files, indent=4)
-    with open("audio/audio_files.json", "w") as json_file:
-        json_file.write(json_data)
+def generate_file_metadata(file_path):
+    file_name = os.path.basename(file_path)
+
+    title = input(f"Titre du fichier {file_name}: ")
+    artist = input(f"Artiste du fichier {file_name}: ")
+    album = input(f"Album du fichier {file_name}: ")
+    date = input(f"Date de publication de {file_name} (format YYYY-MM-DD): ")
+
+    json_metadata = {
+        title: {
+            "file_path": file_path.replace("\\", "/").split(".")[0],
+            "cover_path": file_path.replace("\\", "/").replace(file_name, "cover.jpg"),
+            "artist": artist,
+            "album": album,
+            "date": date
+        }
+    }
+
+    with open(file_path.replace(".wav", ".json"), "w") as json_file:
+        json.dump(json_metadata, json_file, indent=4)
+
+    return json_metadata
+
+
+def generate_all_metadata(folder_path):
+    available_songs_json = defaultdict(dict)
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith(".wav"):
+                # Check for the existence of a metadata file in the json file
+                json_file = file.replace(".wav", ".json")
+                if json_file in files:
+                    with open(os.path.join(root, json_file), "r") as json_metadata:
+                        available_songs_json.update(
+                            json.load(json_metadata))
+                else:
+                    available_songs_json.update(
+                        generate_file_metadata(os.path.join(root, file)))
+
+    with open(os.path.join(folder_path, "files.json"), "w") as available_songs:
+        json.dump(available_songs_json, available_songs, indent=4)
