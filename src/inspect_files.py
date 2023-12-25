@@ -49,12 +49,12 @@ def generate_all_metadata(folder_path, logger):
                             available_songs_json.update(metadata)
                         else:
                             logger.info(
-                                colored(f"Metadata du fichier {file} corrompu.", "red"))
+                                colored(f"Metadata du fichier {file} corrompu, veuillez entrer les informations manquantes.", "red"))
                             available_songs_json.update(
                                 generate_file_metadata(os.path.join(root, file)))
                 else:
                     logger.info(
-                        colored(f"Metadata du fichier {file} non trouvé.", "yellow"))
+                        colored(f"Metadata du fichier {file} non trouvé, veuillez entrer les informations manquantes.", "yellow"))
                     available_songs_json.update(
                         generate_file_metadata(os.path.join(root, file)))
 
