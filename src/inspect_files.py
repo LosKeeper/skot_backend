@@ -10,6 +10,7 @@ def generate_file_metadata(file_path):
     title = input(f"Titre du fichier {file_name}: ")
     artist = input(f"Artiste du fichier {file_name}: ")
     album = input(f"Album du fichier {file_name}: ")
+    track = input(f"Numéro de piste du fichier {file_name}: ")
     date = input(f"Date de publication de {file_name} (format YYYY-MM-DD): ")
 
     json_metadata = {
@@ -18,7 +19,8 @@ def generate_file_metadata(file_path):
             "cover_path": file_path.replace("\\", "/").replace(file_name, "cover.jpg"),
             "artist": artist,
             "album": album,
-            "date": date
+            "date": date,
+            "track": track
         }
     }
 
@@ -39,8 +41,17 @@ def generate_all_metadata(folder_path, logger):
                     logger.info(
                         colored(f"Metadata du fichier {file} trouvé.", "green"))
                     with open(os.path.join(root, json_file), "r") as json_metadata:
-                        available_songs_json.update(
-                            json.load(json_metadata))
+                        # Test if the metadata fields are the wanted ones
+                        metadata = json.load(json_metadata)
+                        required_keys = ["file_path", "cover_path",
+                                         "artist", "album", "date", "track"]
+                        if all(key in metadata for key in required_keys):
+                            available_songs_json.update(metadata)
+                        else:
+                            logger.info(
+                                colored(f"Metadata du fichier {file} corrompu.", "red"))
+                            available_songs_json.update(
+                                generate_file_metadata(os.path.join(root, file)))
                 else:
                     logger.info(
                         colored(f"Metadata du fichier {file} non trouvé.", "yellow"))
