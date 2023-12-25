@@ -6,63 +6,86 @@ from alive_progress import alive_bar
 from termcolor import colored
 
 
-def count_wav_files(directory):
-    return sum(1 for _, _, files in os.walk(directory) for file in files if file.endswith('.wav'))
+class AudioCompressor:
+    def __init__(self, directory, logger):
+        self.directory = directory
+        self.logger = logger
+        self.q = queue.Queue()
+        self.process_files()
 
+    def count_wav_files(self):
+        """Compte le nombre de fichiers .wav dans le répertoire spécifié.
 
-def convert_file(filename, file_path, aac_file, flac_file, q, logger):
-    command = [
-        'ffmpeg', '-i', file_path,
-        '-c:a', 'aac', '-b:a', '256k', aac_file,
-        '-c:a', 'flac', flac_file
-    ]
-    subprocess.run(command, stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
-    logger.info(
-        colored(f"Conversion de {os.path.basename(filename)} terminée.", 'green'))
-    q.put(1)
+        Returns:
+            int: Le nombre de fichiers .wav dans le répertoire spécifié.
+        """
+        return sum(1 for _, _, files in os.walk(self.directory) for file in files if file.endswith('.wav'))
 
+    def convert_file(self, file_name, file_path):
+        """Convertit un fichier .wav en .aac et .flac.
 
-def process_files(directory, logger):
-    total_files = count_wav_files(directory)
-    q = queue.Queue()
+        Args:
+            file_name (str): Le nom du fichier.
+            file_path (str): Le chemin du fichier.
+        """
+        command = [
+            'ffmpeg', '-i', file_path,
+            '-c:a', 'aac', '-b:a', '256k', file_name + '.aac',
+            '-c:a', 'flac', file_name + '.flac'
+        ]
+        subprocess.run(command, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+        self.logger.info(
+            colored(f"Conversion de {os.path.basename(file_name)} terminée.", 'green'))
+        self.q.put(1)
 
-    def update_bar(bar):
+    def update_bar(self, bar):
+        """Met à jour la barre de progression.
+
+        Args:
+            bar (function): La barre de progression.
+        """
         while True:
-            q.get()
+            self.q.get()
             bar()
-            q.task_done()
+            self.q.task_done()
 
-    with alive_bar(total_files, bar='filling', title='Progression totale', spinner='classic') as bar:
-        threading.Thread(target=update_bar, args=(bar,), daemon=True).start()
+    def process_files(self):
+        """Parcours le répertoire spécifié et convertit les fichiers .wav en .aac et .flac récursivement.
+        """
+        total_files = self.count_wav_files()
 
-        threads = []
-        for root, _, files in os.walk(directory):
-            for file in files:
-                if file.endswith('.wav'):
-                    file_path = os.path.join(root, file)
-                    filename = os.path.splitext(file_path)[0]
+        with alive_bar(total_files, bar='filling', title='Progression totale', spinner='classic') as bar:
+            threading.Thread(target=self.update_bar,
+                             args=(bar,), daemon=True).start()
 
-                    aac_file = f"{filename}.aac"
-                    flac_file = f"{filename}.flac"
+            threads = []
+            for root, _, files in os.walk(self.directory):
+                for file in files:
+                    if file.endswith('.wav'):
+                        file_path = os.path.join(root, file)
+                        file_name = os.path.splitext(file_path)[0]
 
-                    if not (os.path.exists(aac_file) and os.path.exists(flac_file)):
-                        for output_file in [aac_file, flac_file]:
-                            if os.path.exists(output_file):
-                                os.remove(output_file)
+                        aac_file = f"{file_name}.aac"
+                        flac_file = f"{file_name}.flac"
 
-                        logger.info(
-                            colored(f"Conversion de {os.path.basename(filename)}...", 'blue'))
-                        thread = threading.Thread(target=convert_file, args=(
-                            filename, file_path, aac_file, flac_file, q, logger))
-                        thread.start()
-                        threads.append(thread)
-                    else:
-                        logger.info(colored(
-                            f"Les fichiers de sortie pour {os.path.basename(filename)} existent déjà, aucune recompression nécessaire.", 'yellow'))
-                        q.put(1)
+                        if not (os.path.exists(aac_file) and os.path.exists(flac_file)):
+                            for output_file in [aac_file, flac_file]:
+                                if os.path.exists(output_file):
+                                    os.remove(output_file)
 
-        for thread in threads:
-            thread.join()
+                            self.logger.info(
+                                colored(f"Conversion de {os.path.basename(file_name)}...", 'blue'))
+                            thread = threading.Thread(target=self.convert_file, args=(
+                                file_name, file_path))
+                            thread.start()
+                            threads.append(thread)
+                        else:
+                            self.logger.info(colored(
+                                f"Les fichiers de sortie pour {os.path.basename(file_name)} existent déjà, aucune recompression nécessaire.", 'yellow'))
+                            self.q.put(1)
 
-        q.join()
+            for thread in threads:
+                thread.join()
+
+            self.q.join()

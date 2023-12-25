@@ -1,0 +1,10 @@
+{
+    <TITLE>: {
+        "file_path": <PATH_TO_FILE>,
+        "cover_path": <PATH_TO_COVER>,
+        "artist": <ARTIST>,
+        "album": <ALBUM>,
+        "date": <YYYY-MM-DD>,
+        "track": <TRACK_NUMBER>
+    }
+}

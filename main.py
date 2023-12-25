@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 import logging
 
-from src.inspect_files import generate_all_metadata
-from src.audio_compressor import process_files
+from src.inspect_files import MetadataGenerator
+from src.audio_compressor import AudioCompressor
 
 if __name__ == "__main__":
     # Configuration du logger
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     folder_path = os.getenv("FOLDER")
 
     if folder_path:
-        process_files(folder_path, logger)
-        generate_all_metadata(folder_path, logger)
+        AudioCompressor(folder_path, logger)
+        MetadataGenerator(folder_path, logger)
     else:
         print("La variable FOLDER n'est pas définie dans le fichier .env")
