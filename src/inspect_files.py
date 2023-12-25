@@ -45,7 +45,7 @@ def generate_all_metadata(folder_path, logger):
                         metadata = json.load(json_metadata)
                         required_keys = ["file_path", "cover_path",
                                          "artist", "album", "date", "track"]
-                        if all(key in metadata for key in required_keys):
+                        if all(key in metadata[0] for key in required_keys):
                             available_songs_json.update(metadata)
                         else:
                             logger.info(
