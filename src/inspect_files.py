@@ -1,6 +1,7 @@
 import os
 import json
 from collections import defaultdict
+from termcolor import colored
 
 
 def generate_file_metadata(file_path):
@@ -27,7 +28,7 @@ def generate_file_metadata(file_path):
     return json_metadata
 
 
-def generate_all_metadata(folder_path):
+def generate_all_metadata(folder_path, logger):
     available_songs_json = defaultdict(dict)
     for root, dirs, files in os.walk(folder_path):
         for file in files:
@@ -35,10 +36,14 @@ def generate_all_metadata(folder_path):
                 # Check for the existence of a metadata file in the json file
                 json_file = file.replace(".wav", ".json")
                 if json_file in files:
+                    logger.info(
+                        colored(f"Metadata du fichier {file} trouvé.", "green"))
                     with open(os.path.join(root, json_file), "r") as json_metadata:
                         available_songs_json.update(
                             json.load(json_metadata))
                 else:
+                    logger.info(
+                        colored(f"Metadata du fichier {file} non trouvé.", "yellow"))
                     available_songs_json.update(
                         generate_file_metadata(os.path.join(root, file)))
 

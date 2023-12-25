@@ -1,22 +1,16 @@
 import os
 import subprocess
-import logging
 import threading
 import queue
 from alive_progress import alive_bar
 from termcolor import colored
-
-# Configuration du logger
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger(__name__)
 
 
 def count_wav_files(directory):
     return sum(1 for _, _, files in os.walk(directory) for file in files if file.endswith('.wav'))
 
 
-def convert_file(filename, file_path, aac_file, flac_file, q):
+def convert_file(filename, file_path, aac_file, flac_file, q, logger):
     command = [
         'ffmpeg', '-i', file_path,
         '-c:a', 'aac', '-b:a', '256k', aac_file,
@@ -29,7 +23,7 @@ def convert_file(filename, file_path, aac_file, flac_file, q):
     q.put(1)
 
 
-def process_files(directory):
+def process_files(directory, logger):
     total_files = count_wav_files(directory)
     q = queue.Queue()
 
@@ -60,7 +54,7 @@ def process_files(directory):
                         logger.info(
                             colored(f"Conversion de {os.path.basename(filename)}...", 'blue'))
                         thread = threading.Thread(target=convert_file, args=(
-                            filename, file_path, aac_file, flac_file, q))
+                            filename, file_path, aac_file, flac_file, q, logger))
                         thread.start()
                         threads.append(thread)
                     else:
@@ -72,8 +66,3 @@ def process_files(directory):
             thread.join()
 
         q.join()
-
-
-if __name__ == "__main__":
-    current_dir = os.getcwd()
-    process_files(current_dir)
