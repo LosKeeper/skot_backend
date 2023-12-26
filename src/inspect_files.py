@@ -21,14 +21,13 @@ class MetadataGenerator:
 
             if "songs" in self.available_albums_json[values["album"]]:
                 self.available_albums_json[values["album"]]["songs"].append(
-                    {keys: values["file_path"]})
+                    {keys: values["file_path"], "track": values["track"]})
             else:
                 self.available_albums_json[values["album"]].update(
-                    {"songs": [{keys: values["file_path"]}]})
+                    {"songs": [{keys: values["file_path"], "track": values["track"]}]})
 
-            # Trier les chansons par numéro de piste
             self.available_albums_json[values["album"]]["songs"].sort(
-                key=lambda song: list(song.keys())[0])
+                key=lambda song: int(song["track"]))
 
         with open(os.path.join(self.folder_path, "available_albums.json"), "w") as available_albums:
             json.dump(self.available_albums_json, available_albums, indent=4)
