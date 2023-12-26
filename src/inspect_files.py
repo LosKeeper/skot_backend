@@ -5,10 +5,9 @@ from termcolor import colored
 
 
 class MetadataGenerator:
-    def __init__(self, folder_path, logger, save_file_name="available_songs.json"):
+    def __init__(self, folder_path, logger):
         self.folder_path = folder_path
         self.logger = logger
-        self.save_file_name = save_file_name
         self.available_songs_json = defaultdict(dict)
         self.available_albums_json = defaultdict(dict)
         self.generate_available_songs()
@@ -20,8 +19,12 @@ class MetadataGenerator:
                 self.available_albums_json[values["album"]].update(
                     {"cover_path": values["cover_path"], "artist": values["artist"], "date": values["date"]})
 
-            self.available_albums_json[values["album"]].update(
-                {"songs": {keys: values["file_path"]}})
+            if "songs" in self.available_albums_json[values["album"]]:
+                self.available_albums_json[values["album"]]["songs"].update(
+                    {keys: values["file_path"]})
+            else:
+                self.available_albums_json[values["album"]].update(
+                    {"songs": {keys: values["file_path"]}})
 
         with open(os.path.join(self.folder_path, "available_albums.json"), "w") as available_albums:
             json.dump(self.available_albums_json, available_albums, indent=4)
@@ -47,7 +50,7 @@ class MetadataGenerator:
                         self.available_songs_json.update(
                             self.generate_song_metadata(os.path.join(root, file)))
 
-        with open(os.path.join(self.folder_path, self.save_file_name), "w") as available_songs:
+        with open(os.path.join(self.folder_path, "available_songs.json"), "w") as available_songs:
             json.dump(self.available_songs_json, available_songs, indent=4)
 
     def test_and_regenerate_song_metadata(self, data, file, root):
