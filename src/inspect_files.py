@@ -32,6 +32,9 @@ class MetadataGenerator:
         with open(os.path.join(self.folder_path, "available_albums.json"), "w") as available_albums:
             json.dump(self.available_albums_json, available_albums, indent=4)
 
+        self.logger.info(colored(
+            f"Le fichier available_albums.json a été généré avec succès.", "green"))
+
     def generate_available_songs(self):
         """
         Parcours le dossier spécifié dans la variable d'environnement FOLDER et génère le fichier JSON contenant les metadata de chaque fichier.
@@ -55,6 +58,9 @@ class MetadataGenerator:
 
         with open(os.path.join(self.folder_path, "available_songs.json"), "w") as available_songs:
             json.dump(self.available_songs_json, available_songs, indent=4)
+
+        self.logger.info(colored(
+            f"Le fichier available_songs.json a été généré avec succès.", "green"))
 
     def test_and_regenerate_song_metadata(self, data, file, root):
         """ Teste si les metadata du fichier sont conformes et, si ce n'est pas le cas, génère les informations manquantes.
