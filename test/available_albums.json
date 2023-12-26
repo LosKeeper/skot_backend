@@ -1,0 +1,32 @@
+{
+    <ALBUM1>: {
+        "cover_path": <PATH_TO_COVER>,
+        "artist": <ARTIST_NAME>,
+        "date": <YYYY-MM-DD>,
+        "songs": [
+            {
+                <SONG1>: <PATH_TO_SONG1>,
+                "track": <TRACK_NUMBER>
+            },
+            {
+                <SONG2>: <PATH_TO_SONG2>,
+                "track": <TRACK_NUMBER>
+            },
+        ]
+    },
+    <ALBUM2>: {
+        "cover_path": <PATH_TO_COVER>,
+        "artist": <ARTIST_NAME>,
+        "date": <YYYY-MM-DD>,
+        "songs": [
+            {
+                <SONG3>: <PATH_TO_SONG3>,
+                "track": <TRACK_NUMBER>
+            },
+            {
+                <SONG4>: <PATH_TO_SONG4>,
+                "track": <TRACK_NUMBER>
+            },
+        ]
+    },
+}
