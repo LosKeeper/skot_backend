@@ -10,9 +10,23 @@ class MetadataGenerator:
         self.logger = logger
         self.save_file_name = save_file_name
         self.available_songs_json = defaultdict(dict)
-        self.generate_all_metadata()
+        self.available_albums_json = defaultdict(dict)
+        self.generate_available_songs()
+        self.generate_available_albums()
 
-    def generate_all_metadata(self):
+    def generate_available_albums(self):
+        for keys, values in self.available_songs_json.items():
+            if values["album"] not in self.available_albums_json:
+                self.available_albums_json[values["album"]].update(
+                    {"cover_path": values["cover_path"], "artist": values["artist"], "date": values["date"]})
+
+            self.available_albums_json[values["album"]].update(
+                {"songs": {keys: values["file_path"]}})
+
+        with open(os.path.join(self.folder_path, "available_albums.json"), "w") as available_albums:
+            json.dump(self.available_albums_json, available_albums, indent=4)
+
+    def generate_available_songs(self):
         """
         Parcours le dossier spécifié dans la variable d'environnement FOLDER et génère le fichier JSON contenant les metadata de chaque fichier.
         """
@@ -25,17 +39,18 @@ class MetadataGenerator:
                             colored(f"Metadata du fichier {file} trouvé.", "green"))
                         with open(os.path.join(root, json_file), "r") as json_metadata:
                             data = json_metadata.read()
-                            self.test_and_regenerate_metadata(data, file, root)
+                            self.test_and_regenerate_song_metadata(
+                                data, file, root)
                     else:
                         self.logger.info(colored(
                             f"Metadata du fichier {file} non trouvé, veuillez entrer les informations manquantes.", "yellow"))
                         self.available_songs_json.update(
-                            self.generate_file_metadata(os.path.join(root, file)))
+                            self.generate_song_metadata(os.path.join(root, file)))
 
         with open(os.path.join(self.folder_path, self.save_file_name), "w") as available_songs:
             json.dump(self.available_songs_json, available_songs, indent=4)
 
-    def test_and_regenerate_metadata(self, data, file, root):
+    def test_and_regenerate_song_metadata(self, data, file, root):
         """ Teste si les metadata du fichier sont conformes et, si ce n'est pas le cas, génère les informations manquantes.
 
         Args:
@@ -56,9 +71,9 @@ class MetadataGenerator:
                 self.logger.info(colored(
                     f"Les metadata de {file} sont corrompus, veuillez entrer les informations manquantes.", "red"))
                 self.available_songs_json.update(
-                    self.generate_file_metadata(os.path.join(root, file)))
+                    self.generate_song_metadata(os.path.join(root, file)))
 
-    def generate_file_metadata(self, file_path):
+    def generate_song_metadata(self, file_path):
         """ Génère les metadata d'un fichier.
 
         Args:
