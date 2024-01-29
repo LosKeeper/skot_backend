@@ -23,6 +23,8 @@ if __name__ == "__main__":
                         help='Le chemin du dossier à traiter')
     parser.add_argument('--title', type=str, help='Le titre à ajouter')
     parser.add_argument('--message', type=str, help='Le message à ajouter')
+    parser.add_argument('--notification', type=str,
+                        help='La notification à ajouter')
     parser.add_argument('--selection', type=str, nargs=2,
                         help='Le couple de titres selectionnés')
 
@@ -42,6 +44,10 @@ if __name__ == "__main__":
         if args.title and args.message:
             MessageGenerator(folder_path + "/messages.json", logger).AddMessage(
                 args.title, args.message)
+
+        elif args.title and args.notification:
+            MessageGenerator(folder_path + "/notifications.json",
+                             logger).AddMessage(args.title, args.notification)
         else:
             logger.error(
                 "Le titre et/ou le message n'ont pas été spécifiés en argument.")
