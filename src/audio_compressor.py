@@ -7,9 +7,10 @@ from termcolor import colored
 
 
 class AudioCompressor:
-    def __init__(self, directory, logger):
+    def __init__(self, directory, logger, force=False):
         self.directory = directory
         self.logger = logger
+        self.force = force
         self.q = queue.Queue()
         self.process_files()
 
@@ -30,7 +31,7 @@ class AudioCompressor:
         """
         command = [
             'ffmpeg', '-i', file_path,
-            '-c:a', 'aac', '-b:a', '256k', file_name + '.aac',
+            '-c:a', 'aac', '-b:a', '320k', file_name + '.aac',
             '-c:a', 'flac', file_name + '.flac'
         ]
         subprocess.run(command, stdout=subprocess.DEVNULL,
@@ -69,7 +70,7 @@ class AudioCompressor:
                         aac_file = f"{file_name}.aac"
                         flac_file = f"{file_name}.flac"
 
-                        if not (os.path.exists(aac_file) and os.path.exists(flac_file)):
+                        if self.force or (not (os.path.exists(aac_file) and os.path.exists(flac_file))):
                             for output_file in [aac_file, flac_file]:
                                 if os.path.exists(output_file):
                                     os.remove(output_file)

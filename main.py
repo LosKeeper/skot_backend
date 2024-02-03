@@ -21,6 +21,8 @@ if __name__ == "__main__":
         description="Générer les metadata et compresser les fichiers audio.")
     parser.add_argument('--folder', type=str,
                         help='Le chemin du dossier à traiter')
+    parser.add_argument('--force', action='store_true',
+                        help='Ecnode les fichiers audio même s\'ils existent déjà')
     parser.add_argument('--title', type=str, help='Le titre à ajouter')
     parser.add_argument('--message', type=str, help='Le message à ajouter')
     parser.add_argument('--selection', type=str, nargs=2,
@@ -36,7 +38,7 @@ if __name__ == "__main__":
     folder_path = os.getenv("FOLDER")
 
     if folder_path:
-        AudioCompressor(folder_path, logger)
+        AudioCompressor(folder_path, logger, args.force)
         metadata = MetadataGenerator(folder_path, logger)
 
         if args.title and args.message:
