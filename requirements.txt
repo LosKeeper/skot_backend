@@ -2,3 +2,4 @@ alive-progress
 termcolor
 python-dotenv
 argparse
+pillow

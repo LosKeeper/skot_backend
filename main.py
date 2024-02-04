@@ -6,6 +6,7 @@ import argparse
 from src.inspect_files import MetadataGenerator
 from src.audio_compressor import AudioCompressor
 from src.message import MessageGenerator
+from src.image_compressor import ImageCompressor
 
 if __name__ == "__main__":
     # Configuration du logger
@@ -39,6 +40,7 @@ if __name__ == "__main__":
 
     if folder_path:
         AudioCompressor(folder_path, logger, args.force)
+        ImageCompressor(folder_path, logger)
         metadata = MetadataGenerator(folder_path, logger)
 
         if args.title and args.message:

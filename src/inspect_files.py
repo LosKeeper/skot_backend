@@ -17,7 +17,7 @@ class MetadataGenerator:
         for keys, values in self.available_songs_json.items():
             if values["album"] not in self.available_albums_json:
                 self.available_albums_json[values["album"]].update(
-                    {"cover_path": values["cover_path"], "artist": values["artist"], "date": values["date"]})
+                    {"cover_path": values["cover_path"], "artist": values["artist"].split('&')[0], "date": values["date"]})
 
             if "songs" in self.available_albums_json[values["album"]]:
                 self.available_albums_json[values["album"]]["songs"].append(
