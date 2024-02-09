@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+    window.onload = function() {
+        document.getElementById('cover').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            var img = document.getElementById('cover-preview');
+            img.src = URL.createObjectURL(file);
+        });
+
+        document.getElementById('songs').addEventListener('change', function(e) {
+            var files = e.target.files;
+            var list = document.getElementById('song-list');
+            list.innerHTML = ''; // Clear the list
+            var container = document.getElementById('form-container');
+            container.innerHTML = ''; // Clear the container
+            for (var i = 0; i < files.length; i++) {
+                var item = document.createElement('li');
+                item.textContent = '💿 ' + files[i].name;
+                list.appendChild(item);
+
+                var form = `
+                    <h2>File: ${files[i].name}</h2>
+                    <label for="title-${i}">Song Title:</label>
+                    <input type="text" id="title-${i}" name="title-${i}">
+                    <br>
+                    <label for="track-${i}">Track Number:</label>
+                    <input type="number" id="track-${i}" name="track-${i}">
+                    <br>
+                    <label for="release_date-${i}">Release Date:</label>
+                    <input type="date" id="release_date-${i}" name="release_date-${i}">
+                    <br>
+                    <label for="authors-${i}">Authors:</label>
+                    <input type="text" id="authors-${i}" name="authors-${i}">
+                    <br>
+                `;
+                container.innerHTML += form;
+            }
+        });
+
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            var inputs = document.querySelectorAll('input[type=text], input[type=number], input[type=date]');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].value == '') {
+                    e.preventDefault();
+                    alert('Please fill all fields before submitting.');
+                    return;
+                }
+            }
+        });
+    };
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Upload</title>
+</head>
+<body>
+    <h1>Album Upload</h1>
+    <form method="POST" enctype="multipart/form-data" id="upload-form">
+        {{ form.hidden_tag() }}
+        <label for="title">Album Title:</label>
+        <input type="text" id="album_title" name="album_title">
+        <br>
+        <label for="cover">Choose a cover image:</label>
+        <input type="file" id="cover" name="cover" accept=".png, .jpg, .jpeg">
+        <img id="cover-preview" src="" style="max-width: 200px; max-height: 200px;">
+        <label for="songs">Choose song(s):</label>
+        <input type="file" id="songs" name="songs" accept=".wav" multiple>
+        <ul id="song-list"></ul>   
+        <br>
+        <div id="form-container"></div>
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

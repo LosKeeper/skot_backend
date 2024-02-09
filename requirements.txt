@@ -3,3 +3,6 @@ termcolor
 python-dotenv
 argparse
 pillow
+flask
+flask-wtf
+flask-login
