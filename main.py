@@ -8,7 +8,8 @@ from src.audio_compressor import AudioCompressor
 from src.message import MessageGenerator
 from src.image_compressor import ImageCompressor
 
-if __name__ == "__main__":
+
+def main():
     # Configuration du logger
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -68,3 +69,7 @@ if __name__ == "__main__":
     else:
         logger.error(
             "La variable FOLDER n'est pas définie dans le fichier .env ou n'a pas été spécifiée en argument.")
+
+
+if __name__ == '__main__':
+    main()
