@@ -8,6 +8,8 @@ import os
 import json
 import hashlib
 
+from main import main
+
 template_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'templates'))
 static_dir = os.path.abspath(os.path.join(
@@ -124,7 +126,7 @@ def upload():
             song_path = os.path.join(album_dir, title.lower())
 
             # Save the song file
-            with open(song_path, 'wb') as file:
+            with open(os.path.join(song_path + '.wav'), 'wb') as file:
                 file.write(song.read())
 
             # Save the metadata
@@ -146,7 +148,7 @@ def upload():
         flash('Files uploaded successfully!', 'success')
 
         # Launch python script
-        os.system('python3 main.py')
+        main()
 
     return render_template('upload.html', form=form)
 
