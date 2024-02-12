@@ -126,7 +126,7 @@ def upload():
             print(release_date_str)
             authors = request.form[f'authors-{i}']
 
-            song_path = os.path.join(album_dir, f'{title.lower()}.wav')
+            song_path = os.path.join(album_dir, title.lower())
 
             # Save the song file
             with open(song_path, 'wb') as file:
@@ -143,7 +143,8 @@ def upload():
                     'track': track
                 }
             }
-            metadata_path = song_path.replace('.wav', '.json')
+            metadata_path = os.path.join(
+                song_path + '.json')
             with open(metadata_path, 'w') as file:
                 json.dump(json_metadata, file, indent=4)
 
