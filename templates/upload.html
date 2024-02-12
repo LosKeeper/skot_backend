@@ -4,60 +4,71 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <script>
-    window.onload = function() {
-        document.getElementById('cover').addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            var img = document.getElementById('cover-preview');
-            img.src = URL.createObjectURL(file);
-        });
+        window.onload = function() {
+            document.getElementById('cover').addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                var img = document.getElementById('cover-preview');
+                img.src = URL.createObjectURL(file);
+            });
 
-        document.getElementById('songs').addEventListener('change', function(e) {
-            var files = e.target.files;
-            var list = document.getElementById('song-list');
-            list.innerHTML = ''; // Clear the list
-            var container = document.getElementById('form-container');
-            container.innerHTML = ''; // Clear the container
-            for (var i = 0; i < files.length; i++) {
-                var item = document.createElement('li');
-                item.textContent = '💿 ' + files[i].name;
-                list.appendChild(item);
+            document.getElementById('songs').addEventListener('change', function(e) {
+                var files = e.target.files;
+                var list = document.getElementById('song-list');
+                list.innerHTML = ''; // Clear the list
+                var container = document.getElementById('form-container');
+                container.innerHTML = ''; // Clear the container
+                for (var i = 0; i < files.length; i++) {
+                    var item = document.createElement('li');
+                    item.textContent = '💿 ' + files[i].name;
+                    list.appendChild(item);
 
-                var form = `
-                    <h2>File: ${files[i].name}</h2>
-                    <label for="title-${i}">Song Title:</label>
-                    <input type="text" id="title-${i}" name="title-${i}">
-                    <br>
-                    <label for="track-${i}">Track Number:</label>
-                    <input type="number" id="track-${i}" name="track-${i}">
-                    <br>
-                    <label for="release_date-${i}">Release Date:</label>
-                    <input type="date" id="release_date-${i}" name="release_date-${i}">
-                    <br>
-                    <label for="authors-${i}">Authors:</label>
-                    <input type="text" id="authors-${i}" name="authors-${i}">
-                    <br>
-                `;
-                container.innerHTML += form;
-            }
-        });
-
-        document.getElementById('upload-form').addEventListener('submit', function(e) {
-            var inputs = document.querySelectorAll('input[type=text], input[type=number], input[type=date]');
-            for (var i = 0; i < inputs.length; i++) {
-                if (inputs[i].value == '') {
-                    e.preventDefault();
-                    alert('Please fill all fields before submitting.');
-                    return;
+                    var form = `
+                        <h2>File: ${files[i].name}</h2>
+                        <label for="title-${i}">Song Title:</label>
+                        <input type="text" id="title-${i}" name="title-${i}">
+                        <br>
+                        <label for="track-${i}">Track Number:</label>
+                        <input type="number" id="track-${i}" name="track-${i}">
+                        <br>
+                        <label for="release_date-${i}">Release Date:</label>
+                        <input type="date" id="release_date-${i}" name="release_date-${i}">
+                        <br>
+                        <label for="authors-${i}">Authors:</label>
+                        <input type="text" id="authors-${i}" name="authors-${i}">
+                        <br>
+                    `;
+                    container.innerHTML += form;
                 }
-            }
-        });
-    };
+            });
+
+            document.getElementById('upload-form').addEventListener('submit', function(e) {
+                // Affiche la section de chargement
+                document.getElementById('loading-overlay').style.display = 'flex';
+
+                var inputs = document.querySelectorAll('input[type=text], input[type=number], input[type=date]');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (inputs[i].value == '') {
+                        e.preventDefault();
+                        alert('Please fill all fields before submitting.');
+                        // Cache la section de chargement en cas d'erreur
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        return;
+                    }
+                }
+            });
+        };
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Album Upload</title>
 </head>
 <body>
     <h1>Album Upload</h1>
+
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
     <form method="POST" enctype="multipart/form-data" id="upload-form">
         {{ form.hidden_tag() }}
         <label for="title">Album Title:</label>
