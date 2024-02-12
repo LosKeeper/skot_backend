@@ -8,8 +8,6 @@ import os
 import json
 import hashlib
 
-from main import main
-
 template_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'templates'))
 static_dir = os.path.abspath(os.path.join(
@@ -148,7 +146,7 @@ def upload():
         flash('Files uploaded successfully!', 'success')
 
         # Launch python script
-        main()
+        os.system('python main.py')
 
     return render_template('upload.html', form=form)
 
