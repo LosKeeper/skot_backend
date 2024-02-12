@@ -7,16 +7,11 @@ import secrets
 import os
 import json
 import hashlib
-from dotenv import load_dotenv
-
-from main import main
 
 template_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'templates'))
 static_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'static'))
-
-load_dotenv()
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config['SECRET_KEY'] = secrets.token_hex(16)
@@ -151,7 +146,7 @@ def upload():
         flash('Files uploaded successfully!', 'success')
 
         # Launch python script
-        main()
+        os.system('python3 main.py')
 
     return render_template('upload.html', form=form)
 
