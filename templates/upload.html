@@ -62,12 +62,14 @@
     <title>Album Upload</title>
 </head>
 <body>
-    <h1>Album Upload</h1>
-
     <div id="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <p>Loading...</p>
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
     </div>
+    
+    <h1>Album Upload</h1>
 
     <form method="POST" enctype="multipart/form-data" id="upload-form">
         {{ form.hidden_tag() }}
