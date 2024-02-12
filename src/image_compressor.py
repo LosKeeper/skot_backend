@@ -13,6 +13,9 @@ class ImageCompressor:
         # Ouvrir l'image
         image = Image.open(img_input_path)
 
+        # Convertir l'image en mode RGB
+        image = image.convert("RGB")
+
         # Vérifier si la taille de l'image est déjà 700x700
         if image.size == (700, 700):
             self.logger.info(
