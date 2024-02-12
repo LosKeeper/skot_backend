@@ -154,5 +154,5 @@ def upload():
 if __name__ == '__main__':
     load_dotenv()
     app.run(
-        ssl_context=(os.getenv('CERT_PERM_PATH'), os.getenv('KEY_PERM_PATH')),
-        port=os.getenv('PORT'))
+        port=8080,
+        debug=True)

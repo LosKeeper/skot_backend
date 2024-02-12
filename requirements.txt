@@ -6,3 +6,4 @@ pillow
 flask
 flask-wtf
 flask-login
+gunicorn
