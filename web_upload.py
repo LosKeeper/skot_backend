@@ -16,6 +16,8 @@ template_dir = os.path.abspath(os.path.join(
 static_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'static'))
 
+load_dotenv()
+
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 login_manager = LoginManager(app)
@@ -154,7 +156,6 @@ def upload():
 
 
 if __name__ == '__main__':
-    load_dotenv()
     app.run(
         port=8080,
         debug=True)
