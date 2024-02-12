@@ -146,7 +146,7 @@ def upload():
         flash('Files uploaded successfully!', 'success')
 
         # Launch python script
-        os.system('python main.py')
+        os.system('python3 main.py')
 
     return render_template('upload.html', form=form)
 
