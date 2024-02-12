@@ -135,7 +135,7 @@ def upload():
             # Save the metadata
             json_metadata = {
                 title: {
-                    'file_path': song_path.split('.')[0],
+                    'file_path': song_path,
                     'cover_path': cover_path,
                     'artist': authors,
                     'album': request.form['album_title'],
