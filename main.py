@@ -16,7 +16,11 @@ def main():
     logger = logging.getLogger(__name__)
 
     # Charger les variables d'environnement depuis le fichier .env
-    load_dotenv()
+    try:
+        load_dotenv()
+    except Exception as e:
+        logger.error("Le fichier .env n'a pas été trouvé.")
+        return
 
     # Créer un parseur d'arguments
     parser = argparse.ArgumentParser(
