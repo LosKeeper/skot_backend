@@ -27,7 +27,7 @@ class ImageCompressor:
         resized_image = image.resize(new_size)
 
         # Enregistrer l'image compressée
-        resized_image.save(img_output_path, "jpg", optimize=True, quality=95)
+        resized_image.save(img_output_path, "JPEG", optimize=True, quality=95)
         self.logger.info(
             colored(f"Compression de la cover de {folder_path} terminée.", "green"))
 
