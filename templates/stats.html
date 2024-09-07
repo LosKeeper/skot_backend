@@ -16,11 +16,11 @@
         </div>
     </div>
 
-    <h1>{{ current_user.username }} statistics</h1>
+    <h1>{{ current_user.username }} Statistics</h1>
 
     <!-- Graphique récapitulatif des 7 derniers jours -->
         <div class="chart-item summary-chart-container">
-        <h2>Listens in the Last 7 Days</h2>
+        <h2>Listens in the last 7 Days</h2>
         <canvas id="summary-chart" class="summary-chart"></canvas>
         <script>
             const summaryCtx = document.getElementById('summary-chart').getContext('2d');
