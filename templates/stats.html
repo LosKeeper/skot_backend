@@ -11,6 +11,78 @@
     <h1>Statistics for {{ current_user.username }}</h1>
     <p>Here are some statistics about the songs you uploaded:</p>
 
+    <!-- Graphique récapitulatif des 7 derniers jours -->
+    <div class="chart-item">
+        <h2>All Listens in the Last 7 Days</h2>
+        <canvas id="summary-chart"></canvas>
+        <script>
+            const summaryCtx = document.getElementById('summary-chart').getContext('2d');
+            const summaryData = {
+                labels: [],
+                datasets: [{
+                    label: 'Total listens per day',
+                    data: [],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    fill: false,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: 'rgba(54, 162, 235, 1)',
+                    pointRadius: 5,
+                    pointStyle: 'circle' // Style des points
+                }]
+            };
+
+            const summaryCounts = {};
+            const now = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(now.getDate() - 7);
+
+            // Initialiser les dates des 7 derniers jours
+            for (let d = new Date(sevenDaysAgo); d <= now; d.setDate(d.getDate() + 1)) {
+                const day = d.toISOString().split('T')[0];
+                summaryCounts[day] = 0;
+                summaryData.labels.push(day);
+            }
+
+            // Compter les écoutes pour chaque jour
+            {% for key, timestamps in stats.items() %}
+                const timestamps{{ loop.index }} = {{ timestamps|tojson }};
+                timestamps{{ loop.index }}.forEach(timestamp => {
+                    const date = new Date(timestamp);
+                    const day = date.toISOString().split('T')[0];
+                    if (day in summaryCounts) {
+                        summaryCounts[day] += 1;
+                    }
+                });
+            {% endfor %}
+
+            // Ajouter les données au graphique
+            for (const [day, count] of Object.entries(summaryCounts)) {
+                summaryData.datasets[0].data.push(count);
+            }
+
+            new Chart(summaryCtx, {
+                type: 'line',
+                data: summaryData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                usePointStyle: true // Utiliser le style des points dans la légende
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+
     <div class="chart-container">
         {% for key, timestamps in stats.items() %}
         <div class="chart-item">
@@ -68,7 +140,7 @@
                 });
             </script>
         </div>
-    {% endfor %}
+        {% endfor %}
     </div>
 </body>
 </html>
