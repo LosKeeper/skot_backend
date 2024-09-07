@@ -40,12 +40,12 @@
 
                     timestamps{{ loop.index }}.forEach(timestamp => {
                         const date = new Date(timestamp);
-                        const hour = date.getUTCHours();
-                        counts{{ loop.index }}[hour] = (counts{{ loop.index }}[hour] || 0) + 1;
+                        const day = date.toISOString().split('T')[0]; // Obtenir la date au format YYYY-MM-DD
+                        counts{{ loop.index }}[day] = (counts{{ loop.index }}[day] || 0) + 1;
                     });
 
-                    for (const [hour, count] of Object.entries(counts{{ loop.index }})) {
-                        data{{ loop.index }}.labels.push(hour + ':00');
+                    for (const [day, count] of Object.entries(counts{{ loop.index }})) {
+                        data{{ loop.index }}.labels.push(day);
                         data{{ loop.index }}.datasets[0].data.push(count);
                     }
 
@@ -56,6 +56,13 @@
                             scales: {
                                 y: {
                                     beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        usePointStyle: true // Utiliser le style des points dans la légende
+                                    }
                                 }
                             }
                         }
