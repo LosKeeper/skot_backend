@@ -11,65 +11,64 @@
     <h1>Statistics for {{ current_user.username }}</h1>
     <p>Here are some statistics about the songs you uploaded:</p>
 
-
     <div class="chart-container">
         {% for key, timestamps in stats.items() %}
-            <div class="chart-item">
-                <h2>{{ key }}</h2>
-                <canvas id="chart-{{ loop.index }}"></canvas>
-                <script>
-                    const ctx{{ loop.index }} = document.getElementById('chart-{{ loop.index }}').getContext('2d');
-                    const data{{ loop.index }} = {
-                        labels: [],
-                        datasets: [{
-                            label: 'Number of listens per hour',
-                            data: [],
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1,
-                            fill: false,
-                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                            pointBorderColor: 'rgba(75, 192, 192, 1)',
-                            pointRadius: 5,
-                            pointStyle: 'circle' // Style des points
-                        }]
-                    };
+        <div class="chart-item">
+            <h2>{{ key }} (Total listens: {{ timestamps|length }})</h2>
+            <canvas id="chart-{{ loop.index }}"></canvas>
+            <script>
+                const ctx{{ loop.index }} = document.getElementById('chart-{{ loop.index }}').getContext('2d');
+                const data{{ loop.index }} = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Number of listens per day',
+                        data: [],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                        pointBorderColor: 'rgba(75, 192, 192, 1)',
+                        pointRadius: 5,
+                        pointStyle: 'circle' // Style des points
+                    }]
+                };
 
-                    const timestamps{{ loop.index }} = {{ timestamps|tojson }};
-                    const counts{{ loop.index }} = {};
+                const timestamps{{ loop.index }} = {{ timestamps|tojson }};
+                const counts{{ loop.index }} = {};
 
-                    timestamps{{ loop.index }}.forEach(timestamp => {
-                        const date = new Date(timestamp);
-                        const day = date.toISOString().split('T')[0]; // Obtenir la date au format YYYY-MM-DD
-                        counts{{ loop.index }}[day] = (counts{{ loop.index }}[day] || 0) + 1;
-                    });
+                timestamps{{ loop.index }}.forEach(timestamp => {
+                    const date = new Date(timestamp);
+                    const day = date.toISOString().split('T')[0]; // Obtenir la date au format YYYY-MM-DD
+                    counts{{ loop.index }}[day] = (counts{{ loop.index }}[day] || 0) + 1;
+                });
 
-                    for (const [day, count] of Object.entries(counts{{ loop.index }})) {
-                        data{{ loop.index }}.labels.push(day);
-                        data{{ loop.index }}.datasets[0].data.push(count);
-                    }
+                for (const [day, count] of Object.entries(counts{{ loop.index }})) {
+                    data{{ loop.index }}.labels.push(day);
+                    data{{ loop.index }}.datasets[0].data.push(count);
+                }
 
-                    new Chart(ctx{{ loop.index }}, {
-                        type: 'line',
-                        data: data{{ loop.index }},
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        usePointStyle: true // Utiliser le style des points dans la légende
-                                    }
+                new Chart(ctx{{ loop.index }}, {
+                    type: 'line',
+                    data: data{{ loop.index }},
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    usePointStyle: true // Utiliser le style des points dans la légende
                                 }
                             }
                         }
-                    });
-                </script>
-            </div>
-        {% endfor %}
+                    }
+                });
+            </script>
+        </div>
+    {% endfor %}
     </div>
 </body>
 </html>

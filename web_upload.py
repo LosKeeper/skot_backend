@@ -168,8 +168,11 @@ def stat(methods=['GET']):
 
     nginx_file = os.getenv('NGINX_ACCESS_LOG')
 
-    parser = NginxParser.NginxParser(nginx_file)
+    parser = NginxParser.NginxParser(
+        nginx_file, os.getenv('FOLDER')+"/available_songs.json")
     stats = parser.dict[username] if username in parser.dict else {}
+
+    # Get the dict of songs name
     return render_template('stats.html', stats=stats)
 
 
