@@ -7,6 +7,9 @@ import secrets
 import os
 import json
 import hashlib
+from dotenv import load_dotenv
+
+import src.nginx_parser as NginxParser
 
 template_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'templates'))
@@ -68,7 +71,7 @@ class UploadForm(FlaskForm):
 
 @app.route('/')
 def index():
-    return 'Welcome to the home page!'
+    return redirect(url_for('stats'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -81,7 +84,7 @@ def login():
         if user:
             login_user(user)
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('upload'))
+            return redirect(url_for('stats'))
         else:
             flash('Invalid username or password!', 'error')
 
@@ -149,6 +152,28 @@ def upload():
         os.system('python3 main.py')
 
     return render_template('upload.html', form=form)
+
+
+@app.route('/stats')
+@login_required
+def stats(methods=['GET']):
+    # Get the username
+    username = current_user.username
+
+    # Charger les variables d'environnement depuis le fichier .env
+    try:
+        load_dotenv()
+    except Exception as e:
+        print('Le fichier .env n\'a pas été trouvé.')
+
+    nginx_file = os.getenv('NGINX_ACCESS_LOG')
+
+    parser = NginxParser.NginxParser(
+        nginx_file, os.getenv('FOLDER')+"/available_songs.json")
+    stats = parser.dict[username] if username in parser.dict else {}
+
+    # Get the dict of songs name
+    return render_template('stats.html', stats=stats)
 
 
 if __name__ == '__main__':
