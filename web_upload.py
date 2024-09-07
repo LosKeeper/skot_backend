@@ -158,8 +158,7 @@ def upload():
 @login_required
 def stat(methods=['GET']):
     # Get the username
-    # username = current_user.username
-    username = "anybalsmith"
+    username = current_user.username
 
     # Charger les variables d'environnement depuis le fichier .env
     try:
