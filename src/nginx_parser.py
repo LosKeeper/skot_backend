@@ -24,7 +24,8 @@ class NginxParser:
                     date_formated = dt.datetime.strptime(
                         date_str, "%d/%b/%Y:%H:%M:%S %z")
                     artist_name = match.group(2).split('/')[2]
-                    file_path = match.group(2).replace('%20', ' ')
+                    file_path = match.group(2).replace(
+                        '%20', ' ').replace('%7C', '|').replace('%22', '"').replace('%27', "'").replace('%2C', ',').replace('%28', '(').replace('%29', ')')
                     key = self.find_song_from_path(metadata_dict, file_path)
                     value = date_formated
                     if artist_name not in self.dict:
