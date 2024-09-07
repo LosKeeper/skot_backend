@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Statistics for {{ current_user.username }}</h1>
+    <p>Here are some statistics about the songs you uploaded:</p>
+
+
+    <div class="chart-container">
+        {% for key, timestamps in stats.items() %}
+            <div class="chart-item">
+                <h2>{{ key }}</h2>
+                <canvas id="chart-{{ loop.index }}"></canvas>
+                <script>
+                    const ctx{{ loop.index }} = document.getElementById('chart-{{ loop.index }}').getContext('2d');
+                    const data{{ loop.index }} = {
+                        labels: [],
+                        datasets: [{
+                            label: 'Number of listens per hour',
+                            data: [],
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            fill: false,
+                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                            pointBorderColor: 'rgba(75, 192, 192, 1)',
+                            pointRadius: 5,
+                            pointStyle: 'circle' // Style des points
+                        }]
+                    };
+
+                    const timestamps{{ loop.index }} = {{ timestamps|tojson }};
+                    const counts{{ loop.index }} = {};
+
+                    timestamps{{ loop.index }}.forEach(timestamp => {
+                        const date = new Date(timestamp);
+                        const hour = date.getUTCHours();
+                        counts{{ loop.index }}[hour] = (counts{{ loop.index }}[hour] || 0) + 1;
+                    });
+
+                    for (const [hour, count] of Object.entries(counts{{ loop.index }})) {
+                        data{{ loop.index }}.labels.push(hour + ':00');
+                        data{{ loop.index }}.datasets[0].data.push(count);
+                    }
+
+                    new Chart(ctx{{ loop.index }}, {
+                        type: 'line',
+                        data: data{{ loop.index }},
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

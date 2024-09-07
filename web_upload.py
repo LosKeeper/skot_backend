@@ -7,6 +7,9 @@ import secrets
 import os
 import json
 import hashlib
+from dotenv import load_dotenv
+
+import src.nginx_parser as NginxParser
 
 template_dir = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'templates'))
@@ -149,6 +152,25 @@ def upload():
         os.system('python3 main.py')
 
     return render_template('upload.html', form=form)
+
+
+@app.route('/stats')
+@login_required
+def stat(methods=['GET']):
+    # Get the username
+    username = current_user.username
+
+    # Charger les variables d'environnement depuis le fichier .env
+    try:
+        load_dotenv()
+    except Exception as e:
+        print('Le fichier .env n\'a pas été trouvé.')
+
+    nginx_file = os.getenv('NGINX_ACCESS_LOG')
+
+    parser = NginxParser.NginxParser(nginx_file)
+    stats = parser.dict[username] if username in parser.dict else {}
+    return render_template('stats.html', stats=stats)
 
 
 if __name__ == '__main__':
