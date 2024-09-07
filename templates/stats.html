@@ -8,7 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Statistics for {{ current_user.username }}</h1>
+    <div class="header">
+        <h1>SKOT Artist Page</h1>
+        <div class="nav-buttons">
+            <a href="{{ url_for('stats') }}">Stats</a>
+            <a href="{{ url_for('upload') }}">Upload</a>
+        </div>
+    </div>
+
+    <h1>{{ current_user.username }} statistics</h1>
 
     <!-- Graphique récapitulatif des 7 derniers jours -->
     <div class="chart-item summary-chart-container">
@@ -102,7 +110,7 @@
         </script>
     </div>
 
-    <h2>Statistics for each song:</h2>
+    <h2>Statistics for each songs:</h2>
 
     <div class="chart-container">
         {% for key, timestamps in stats.items() %}

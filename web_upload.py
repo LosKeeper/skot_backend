@@ -71,7 +71,7 @@ class UploadForm(FlaskForm):
 
 @app.route('/')
 def index():
-    return 'Welcome to the home page!'
+    return redirect(url_for('stats'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -84,7 +84,7 @@ def login():
         if user:
             login_user(user)
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('upload'))
+            return redirect(url_for('stats'))
         else:
             flash('Invalid username or password!', 'error')
 
@@ -156,7 +156,7 @@ def upload():
 
 @app.route('/stats')
 @login_required
-def stat(methods=['GET']):
+def stats(methods=['GET']):
     # Get the username
     username = current_user.username
 
