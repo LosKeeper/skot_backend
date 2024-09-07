@@ -13,27 +13,15 @@
 
     <!-- Graphique récapitulatif des 7 derniers jours -->
     <div class="chart-item">
-        <h2>All Listens in the Last 7 Days</h2>
+        <h2>Listens in the Last 7 Days</h2>
         <canvas id="summary-chart"></canvas>
         <script>
             const summaryCtx = document.getElementById('summary-chart').getContext('2d');
             const summaryData = {
                 labels: [],
-                datasets: [{
-                    label: 'Total listens per day',
-                    data: [],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1,
-                    fill: false,
-                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                    pointBorderColor: 'rgba(54, 162, 235, 1)',
-                    pointRadius: 5,
-                    pointStyle: 'circle' // Style des points
-                }]
+                datasets: []
             };
 
-            const summaryCounts = {};
             const now = new Date();
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(now.getDate() - 7);
@@ -41,26 +29,56 @@
             // Initialiser les dates des 7 derniers jours
             for (let d = new Date(sevenDaysAgo); d <= now; d.setDate(d.getDate() + 1)) {
                 const day = d.toISOString().split('T')[0];
-                summaryCounts[day] = 0;
                 summaryData.labels.push(day);
             }
 
-            // Compter les écoutes pour chaque jour
+            // Couleurs pour les courbes
+            const colors = [
+                'rgba(75, 192, 192, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)'
+            ];
+
+            // Compter les écoutes pour chaque chanson et chaque jour
             {% for key, timestamps in stats.items() %}
                 const timestamps{{ loop.index }} = {{ timestamps|tojson }};
+                const counts{{ loop.index }} = {};
+
+                // Initialiser les comptes pour chaque jour
+                for (let d = new Date(sevenDaysAgo); d <= now; d.setDate(d.getDate() + 1)) {
+                    const day = d.toISOString().split('T')[0];
+                    counts{{ loop.index }}[day] = 0;
+                }
+
                 timestamps{{ loop.index }}.forEach(timestamp => {
                     const date = new Date(timestamp);
                     const day = date.toISOString().split('T')[0];
-                    if (day in summaryCounts) {
-                        summaryCounts[day] += 1;
+                    if (day in counts{{ loop.index }}) {
+                        counts{{ loop.index }}[day] += 1;
                     }
                 });
-            {% endfor %}
 
-            // Ajouter les données au graphique
-            for (const [day, count] of Object.entries(summaryCounts)) {
-                summaryData.datasets[0].data.push(count);
-            }
+                const dataPoints = [];
+                for (const day of summaryData.labels) {
+                    dataPoints.push(counts{{ loop.index }}[day]);
+                }
+
+                summaryData.datasets.push({
+                    label: '{{ key }}',
+                    data: dataPoints,
+                    backgroundColor: colors[{{ loop.index0 }} % colors.length],
+                    borderColor: colors[{{ loop.index0 }} % colors.length],
+                    borderWidth: 1,
+                    fill: false,
+                    pointBackgroundColor: colors[{{ loop.index0 }} % colors.length],
+                    pointBorderColor: colors[{{ loop.index0 }} % colors.length],
+                    pointRadius: 5,
+                    pointStyle: 'circle' // Style des points
+                });
+            {% endfor %}
 
             new Chart(summaryCtx, {
                 type: 'line',
